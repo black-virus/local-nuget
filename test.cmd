@@ -1,0 +1,1 @@
+packages\xunit.runner.console.2.1.0\tools\xunit.console NugetRunner.Tests\bin\Debug\NugetRunner.Tests.dll -verbose -diagnostics

@@ -9,7 +9,7 @@ using LocalNuget.Storage;
 
 namespace LocalNuget.Commands.Add
 {
-    public class AddLocalNugetCommand : ILineCommandWithOptions<AddLocalNugetOptions>
+    public class AddLocalNugetCommand : ILineCommand
     {
 
         #region Fields
@@ -43,7 +43,7 @@ namespace LocalNuget.Commands.Add
         public void Execute()
         {
             var csProjFileInfo = new FileInfo(Options.VisualStudioProject);
-            if (!csProjFileInfo.Exists) throw new AddLocalNugetException(AddLocalNugetExceptionReason.CsProjNotExist);
+            if (!csProjFileInfo.Exists) throw CommandException.CsProjNotExistException(csProjFileInfo.FullName);
             var nuspecFileName = csProjFileInfo.Name.Replace(csProjFileInfo.Extension, ".nuspec");
             // ReSharper disable once PossibleNullReferenceException
             var nuspecProjFile = new FileInfo(Path.Combine(csProjFileInfo.Directory.FullName, nuspecFileName));
@@ -56,7 +56,7 @@ namespace LocalNuget.Commands.Add
                     nuspecProjFile.Refresh();
                 }
                 else
-                    throw new AddLocalNugetException(AddLocalNugetExceptionReason.NuspecExist, new AddLocalNugetException(AddLocalNugetExceptionReason.NuspecInProjectExist));
+                    throw CommandException.NuspecInProjectExistException(nuspecProjFile.FullName);
             }
             if (nuspecWorkFile.Exists)
             {
@@ -66,13 +66,15 @@ namespace LocalNuget.Commands.Add
                     nuspecWorkFile.Refresh();
                 }
                 else
-                    throw new AddLocalNugetException(AddLocalNugetExceptionReason.NuspecExist, new AddLocalNugetException(AddLocalNugetExceptionReason.NuspecInWorkExist));
+                    throw CommandException.NuspecInWorkExistException(nuspecWorkFile.FullName);
             }
 
             var procInfo = new ProcessStartInfo(Path.Combine(settings.WorkDirectory, "nuget.exe"))
             {
                 Arguments = $"spec {csProjFileInfo.Name} -f",
                 UseShellExecute = false,
+                CreateNoWindow = true,
+                WindowStyle = ProcessWindowStyle.Hidden,
                 RedirectStandardOutput = true,
                 WorkingDirectory = csProjFileInfo.Directory.FullName
             };
@@ -85,7 +87,7 @@ namespace LocalNuget.Commands.Add
             proc?.WaitForExit();
 
             nuspecProjFile.Refresh();
-            if (!nuspecProjFile.Exists) throw new AddLocalNugetException(AddLocalNugetExceptionReason.CreateNuspecInProjectFailed);
+            if (!nuspecProjFile.Exists) throw CommandException.CreateNuspecInProjectFailedException();
             // setup links
             var nuspec = new Nuspec(nuspecProjFile.FullName)
             {
@@ -95,16 +97,7 @@ namespace LocalNuget.Commands.Add
             };
             nuspec.Save();
             nuspecProjFile.CopyTo(nuspecWorkFile.FullName);
-            try
-            {
-                storage.Add(nuspecProjFile.Name, csProjFileInfo.FullName, nuspecProjFile.FullName);
-            }
-            catch (LocalNugetException exc)
-            {
-                if (exc.Code != "C:LNC02C01" || !Options.Force) throw;
-                storage.Remove(nuspecProjFile.Name);
-                storage.Add(nuspecProjFile.Name, csProjFileInfo.FullName, nuspecProjFile.FullName);
-            }
+            storage.Add(nuspecProjFile.Name, csProjFileInfo.FullName, nuspecProjFile.FullName, Options.Force);
         }
 
         #endregion

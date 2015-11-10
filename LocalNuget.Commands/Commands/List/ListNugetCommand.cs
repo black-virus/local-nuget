@@ -7,24 +7,23 @@ using LocalNuget.Storage;
 
 namespace LocalNuget.Commands.List
 {
-    public class ListNugetCommand : ILineCommand, ILineCommandResult<PackageInfoModel[]>
+    public class ListNugetCommand : ILineCommand
     {
         // Fields
         private readonly IStorage storage;
-
-        // Properties
-        public IResultBus<PackageInfoModel[]> ResultBus { get; set; }
+        private readonly IResultBus<PackageInfoModel> resultBus;
 
         // Constructors
-        public ListNugetCommand(IStorage storage)
+        public ListNugetCommand(IStorage storage, IResultBus<PackageInfoModel> resultBus)
         {
             this.storage = storage;
+            this.resultBus = resultBus;
         }
 
         //Methods
         public void Execute()
         {
-            ResultBus.SetResult(storage.List().Select(Mapper.Map<StoragePackage, PackageInfoModel>).ToArray());
+            resultBus.SetResult(storage.List().Select(Mapper.Map<StoragePackage, PackageInfoModel>).ToArray());
         }
 
     }

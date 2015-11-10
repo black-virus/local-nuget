@@ -51,13 +51,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CommandOptions.cs" />
-    <Compile Include="CommandsCollection.cs" />
     <Compile Include="Commands\Add\AddLocalNugetCommand.cs" />
-    <Compile Include="Commands\Add\AddLocalNugetException.cs" />
-    <Compile Include="Commands\Add\AddLocalNugetExceptionReason.cs" />
+    <Compile Include="CommandException.cs" />
     <Compile Include="Commands\Add\AddLocalNugetOptions.cs" />
     <Compile Include="Commands\List\ListNugetCommand.cs" />
-    <Compile Include="ICommandRunner.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

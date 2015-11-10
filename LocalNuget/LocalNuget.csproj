@@ -72,6 +72,10 @@
       <Project>{0682B2F4-052E-4302-940E-692FB6178A5C}</Project>
       <Name>LocalNuget.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\LocalNuget.Models\LocalNuget.Models.csproj">
+      <Project>{FDAB2C90-6793-4422-93FE-BA0676CE079B}</Project>
+      <Name>LocalNuget.Models</Name>
+    </ProjectReference>
     <ProjectReference Include="..\LocalNuget.Settings\LocalNuget.Settings.csproj">
       <Project>{FA2784B1-BEA7-43FF-B196-DD2939B79BCE}</Project>
       <Name>LocalNuget.Settings</Name>

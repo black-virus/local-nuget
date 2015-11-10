@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using LocalNuget.Models;
@@ -27,7 +28,16 @@ namespace LocalNuget.Storage
                 using (var fs = file.OpenRead())
                 using (var sw = new StreamReader(fs))
                 {
-                    innerStorage = new List<StoragePackage>(JsonConvert.DeserializeObject<StoragePackage[]>(sw.ReadToEnd()));
+                    var content = sw.ReadToEnd();
+                    try
+                    {
+                        innerStorage =
+                            new List<StoragePackage>(JsonConvert.DeserializeObject<StoragePackage[]>(content));
+                    }
+                    catch (Exception)
+                    {
+                        innerStorage = new List<StoragePackage>();
+                    }
                 }
             }
             else
@@ -42,10 +52,15 @@ namespace LocalNuget.Storage
 
         #region Methods
 
-        public void Add(string name, string csProjFile, string nuspecFile)
+        public void Add(string name, string csProjFile, string nuspecFile, bool updateIfExist = false)
         {
             if (innerStorage.Any(package => package.Name.Equals(name)))
-                throw new StorageLocalNugetException(StorageLocalNugetExceptionReason.PackageAlreadyExist);
+            {
+                if (updateIfExist)
+                    Remove(name);
+                else
+                    throw StorageException.PackageAlreadyExist(name);
+            }
             innerStorage.Add(new StoragePackage
             {
                 Name = name,

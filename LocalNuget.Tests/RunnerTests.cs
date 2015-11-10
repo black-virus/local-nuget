@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using System;
 using System.Diagnostics;
+using FluentAssertions;
 using Xunit;
 // ReSharper disable UnusedMember.Global
 
@@ -26,7 +27,9 @@ namespace LocalNuget.Tests
                 }
             };
             var s = JsonConvert.SerializeObject(settings);
-            Debug.WriteLine(s);
+            s.Should()
+                .Be(
+                    "{\"WorkDirectory\":\"C:\\\\00_Praca\\\\99_WorkingCopy\\\\Local NUGET\\\\LocalNuget.Tests\\\\bin\\\\Debug\",\"Defaults\":{\"LicenceUrl\":\"http://licence.url\",\"IconUrl\":\"http://path.icon\"}}");
         }
 
     }

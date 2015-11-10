@@ -51,7 +51,7 @@
     <Compile Include="IStorage.cs" />
     <Compile Include="JsonFileStorage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="StorageLocalNugetException.cs" />
+    <Compile Include="StorageException.cs" />
     <Compile Include="StorageLocalNugetExceptionReason.cs" />
   </ItemGroup>
   <ItemGroup>

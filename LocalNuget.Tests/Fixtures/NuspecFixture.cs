@@ -1,10 +1,12 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Reflection;
+using System.Threading;
 using static System.IO.Path;
 
 namespace LocalNuget.Tests.Fixtures
 {
-    public class NuspecFixture
+    public class NuspecFixture : IDisposable
     {
 
         public static string CsProjLocation { get; } = @"C:\00_Praca\99_WorkingCopy\Local NUGET\LocalNuget.Tests\LocalNuget.Tests.csproj";
@@ -43,5 +45,17 @@ namespace LocalNuget.Tests.Fixtures
             }
         }
 
+        public void Dispose()
+        {
+            GC.SuppressFinalize(this);
+            var tries = 10;
+            while (tries > 0)
+            {
+                ClearNuspecs();
+                ClearStorage();
+                Thread.Sleep(1000);
+                tries--;
+            }
+        }
     }
 }

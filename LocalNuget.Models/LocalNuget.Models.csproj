@@ -44,7 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AutoMapperModels.cs" />
+    <Compile Include="MapperProfile.cs" />
     <Compile Include="PackageInfoModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StoragePackage.cs" />

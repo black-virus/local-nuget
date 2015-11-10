@@ -2,14 +2,31 @@ namespace LocalNuget.Core.Exceptions
 {
     public class ExceptionSpace
     {
-        internal string SpaceCode { get; }
+        public string SpaceCode { get; }
+        public string SpaceDefaultDescription { get; }
 
-        private ExceptionSpace(string code)
+        private ExceptionSpace(string code, string defaultDescription)
         {
             SpaceCode = code;
+            SpaceDefaultDescription = defaultDescription;
         }
 
-        public static ExceptionSpace AddCommandExceptions { get; } = new ExceptionSpace(ExceptionSpaces.AddCommandExceptions);
-        public static ExceptionSpace StorageExceptions { get; } = new ExceptionSpace(ExceptionSpaces.StorageExceptions);
+        public static ExceptionSpace AddCommandExceptions { get; } = new ExceptionSpace("CMD", "Add nuspec exceptions");
+        public static ExceptionSpace StorageExceptions { get; } = new ExceptionSpace("STR", "Storage exceptions");
     }
+
+    public abstract class ExceptionData
+    {
+
+        public string Code { get; }
+        public string Description { get; }
+
+        protected ExceptionData(string code, string description)
+        {
+            Code = code;
+            Description = description;
+        }
+
+    }
+
 }

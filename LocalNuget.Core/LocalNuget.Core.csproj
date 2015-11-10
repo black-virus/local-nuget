@@ -48,12 +48,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Commands\ICommandOptions.cs" />
     <Compile Include="Commands\ILineCommand.cs" />
-    <Compile Include="Commands\ILineCommandResult.cs" />
-    <Compile Include="Commands\ILineCommandWithOptions.cs" />
     <Compile Include="Exceptions\ExceptionSpace.cs" />
-    <Compile Include="Exceptions\ExceptionSpaces.cs" />
+    <Compile Include="Results\ConsoleResultBus.cs" />
     <Compile Include="Results\FormatInfoAttribute.cs" />
     <Compile Include="Results\FormatPropertiesResolver.cs" />
     <Compile Include="Results\IOutputFormat.cs" />

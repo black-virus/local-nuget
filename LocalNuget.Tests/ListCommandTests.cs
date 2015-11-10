@@ -32,9 +32,8 @@ namespace LocalNuget.Tests
             nuspecFixture.ClearNuspecs();
             AddNuscpec(new AddLocalNugetOptions { VisualStudioProject = NuspecFixture.CsProjLocation, Force = true });
             AddNuscpec(new AddLocalNugetOptions { VisualStudioProject = NuspecFixture.CsProjLocation2, Force = true });
-            var cmd = new ListNugetCommand(new JsonFileStorage(settingsFixture.Settings));
-            var resultBus = new Mock<IResultBus<PackageInfoModel[]>>();
-            cmd.ResultBus = resultBus.Object;
+            var resultBus = new Mock<IResultBus<PackageInfoModel>>();
+            var cmd = new ListNugetCommand(new JsonFileStorage(settingsFixture.Settings), resultBus.Object);
             Func<PackageInfoModel[], bool> resultIs = result =>
             {
                 if (result.Length != 2) return false;

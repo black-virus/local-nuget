@@ -63,7 +63,7 @@ namespace LocalNuget.Tests
             nuspecFixture.ClearNuspecs();
             AddNuscpec();
             LocalNugetException exc = Assert.ThrowsAny<LocalNugetException>(() => AddNuscpec());
-            Assert.Equal("C:LNC01C05", exc.Code);
+            Assert.Equal("CMDADD02", exc.Code);
 
             AddNuscpec(new AddLocalNugetOptions
             {

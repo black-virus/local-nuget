@@ -1,41 +1,49 @@
 ﻿using System;
-//using NugetRunner.Commands.Commands.Rebuild;
-//using CommandsDeclarations = NugetRunner.Commands.Commands;
-using LocalNuget.Commands;
 using LocalNuget.Commands.Add;
 using LocalNuget.Settings;
 using AutoMapper;
 using LocalNuget.Commands.List;
+using LocalNuget.Core.Commands;
+using LocalNuget.Core.Results;
+using LocalNuget.Models;
 using LocalNuget.Storage;
+using Ninject;
 
 namespace LocalNuget
 {
     class Program
     {
 
-        static void RegisterCommands()
+        private static IKernel _kernel;
+
+        private static void SetupIoC()
         {
-            CommandsCollection.RegisterConstructorParameter<IStringSettingsReader, JSonSettingsReader>(true);
-            CommandsCollection.RegisterConstructorParameter<ISettingsReader, WorkSettingsReader>(true);
-            CommandsCollection.RegisterConstructorParameter<ISettings, NugetSettings>(true);
-            CommandsCollection.RegisterConstructorParameter<IStorage, JsonFileStorage>();
-            CommandsCollection.RegisterCommand<AddLocalNugetCommand>("add");
-            CommandsCollection.RegisterCommand<ListNugetCommand>("list");
-            //CommandsCollection.RegisterCommand<CommandsDeclarations.Rebuild.Command, CommandsDeclarations.Rebuild.Options>("rebuild");
+            _kernel = new StandardKernel();
+            _kernel.Bind<IStringSettingsReader>().To<JSonSettingsReader>().InSingletonScope();
+            _kernel.Bind<ISettingsReader>().To<WorkSettingsReader>().InSingletonScope();
+            _kernel.Bind<ISettings>().To<NugetSettings>().InSingletonScope();
+            _kernel.Bind<IStorage>().To<JsonFileStorage>();
+            _kernel.Bind<IOutputFormat>().To<TextOutputFormat>().InSingletonScope();
+
+            // Result bus
+            _kernel.Bind<IResultBus<PackageInfoModel>>().To<ConsoleResultBus<PackageInfoModel>>().InSingletonScope();
         }
 
-        static void RegisterMappings()
+        private static void RegisterMappings()
         {
-            Mapper.AddProfile<MapperProfile>();
+            Mapper.AddProfile<Models.MapperProfile>();
+            Mapper.AddProfile<Settings.MapperProfile>();
         }
 
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             RegisterMappings();
-            RegisterCommands();
+            SetupIoC();
 
-            if (args.Length > 0) ExecuteOneCommand(args);
-            else ExecuteCoupleCommands();
+            if (args.Length > 0)
+                ExecuteOneCommand(args);
+            else
+                ExecuteCoupleCommands();
         }
 
         private static void ExecuteCoupleCommands()
@@ -60,17 +68,31 @@ namespace LocalNuget
         private static void ExecuteCommand(string[] args)
         {
             var cmdWithArgsInput = ResolveCommandWithArguments(args);
-            var cmd = CommandsCollection.GetRunner(cmdWithArgsInput.Item1);
-            if (cmd.Options != null)
+            ILineCommand command;
+            object options = null;
+            switch (cmdWithArgsInput.Item1)
             {
-                var parseState = CommandLine.Parser.Default.ParseArguments(cmdWithArgsInput.Item2, cmd.Options);
+                case "add":
+                    var addCommand = _kernel.Get<AddLocalNugetCommand>();
+                    addCommand.Options = new AddLocalNugetOptions();
+                    options = addCommand.Options;
+                    command = addCommand;
+                    break;
+                case "list":
+                    var listCommand = _kernel.Get<ListNugetCommand>();
+                    command = listCommand;
+                    break;
+                default: throw new Exception("Command not found");
+            }
+            if (options != null)
+            {
+                var parseState = CommandLine.Parser.Default.ParseArguments(cmdWithArgsInput.Item2, options);
                 if (!parseState)
                 {
-                    //Console.WriteLine(cmd.Options.GetUsage());
                     return;
                 }
             }
-            cmd.Execute();
+            command.Execute();
         }
 
         private static Tuple<string, string[]> ResolveCommandWithArguments(string[] args)

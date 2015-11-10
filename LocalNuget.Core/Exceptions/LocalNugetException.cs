@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace LocalNuget.Core.Exceptions
 {
@@ -6,17 +9,26 @@ namespace LocalNuget.Core.Exceptions
     public abstract class LocalNugetException : Exception
     {
 
-        public string Code => $"C:{Space.SpaceCode}{ExceptionCode}";
+        public string Code => $"{Space.SpaceCode}{ExceptionData.Code}";
+        public string Description => $"{Space.SpaceDefaultDescription}\r\n{ExceptionData.Description}";
         // ReSharper disable once MemberCanBePrivate.Global
-        public ExceptionSpace Space { get; }
+        public abstract ExceptionSpace Space { get; }
         // ReSharper disable once MemberCanBePrivate.Global
-        public string ExceptionCode { get; }
+        public ExceptionData ExceptionData { get; }
+        protected Dictionary<string, string> additionalInfo = new Dictionary<string, string>();
 
-        protected LocalNugetException(ExceptionSpace space, string exceptionCode, Exception innerException = null)
-            : base($"C:{space.SpaceCode}{exceptionCode}", innerException)
+        public override IDictionary Data => new Dictionary<string, string>
         {
-            Space = space;
-            ExceptionCode = exceptionCode;
+            {"SpaceCode", Space.SpaceCode},
+            {"SpaceDescription", Space.SpaceDefaultDescription},
+            {"ExceptionDataCode", ExceptionData.Code},
+            {"ExceptionDataDescription", ExceptionData.Description}
+        }.Union(additionalInfo).ToDictionary(k => k.Key, v => v.Value);
+
+        protected LocalNugetException(ExceptionData data, Exception innerException = null)
+            : base(data.Description, innerException)
+        {
+            ExceptionData = data;
         }
 
     }

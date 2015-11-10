@@ -1,11 +1,10 @@
 ﻿using CommandLine;
 using CommandLine.Text;
-using LocalNuget.Core.Commands;
 
 namespace LocalNuget.Commands
 {
 
-    public abstract class CommandOptions : ICommandOptions
+    public abstract class CommandOptions
     {
         [ParserState]
         // ReSharper disable once UnusedMember.Global

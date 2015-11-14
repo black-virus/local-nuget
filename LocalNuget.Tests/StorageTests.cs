@@ -11,13 +11,16 @@ namespace LocalNuget.Tests
 {
 
     [Trait("", "Storage tests")]
-    public class StorageTests : IClassFixture<SettingsFixture>
+    public class StorageTests : IClassFixture<SettingsFixture>, IClassFixture<NuspecFixture>
     {
         private readonly SettingsFixture settingsFixture;
+        private readonly NuspecFixture nuspecFixture;
 
-        public StorageTests(SettingsFixture settings)
+        public StorageTests(SettingsFixture settings, NuspecFixture nuspecFixture)
         {
             settingsFixture = settings;
+            this.nuspecFixture = nuspecFixture;
+            this.nuspecFixture.AttachToWorkDirectory(settingsFixture.Settings.WorkDirectory);
         }
 
         [Fact(DisplayName = "Add and get")]
@@ -25,7 +28,7 @@ namespace LocalNuget.Tests
         {
             IStorage storage = new JsonFileStorage(settingsFixture.Settings);
             var name = "test";
-            var csProj = NuspecFixture.CsProjLocation;
+            var csProj = nuspecFixture.CsProjLocation;
             var nuspec = csProj.Replace(".csproj", ".nuspec");
             storage.Add(name, csProj, nuspec);
             var package = storage.Get("test");
@@ -55,8 +58,8 @@ namespace LocalNuget.Tests
             };
             var name1 = "test-1";
             var name2 = "test-2";
-            var csProj1 = NuspecFixture.CsProjLocation;
-            var csProj2 = NuspecFixture.CsProjLocation2;
+            var csProj1 = nuspecFixture.CsProjLocation;
+            var csProj2 = nuspecFixture.CsProjLocation2;
             act(name1, csProj1);
             act(name2, csProj2);
             var packages = storage.List();

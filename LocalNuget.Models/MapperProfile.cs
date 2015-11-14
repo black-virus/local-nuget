@@ -8,8 +8,9 @@ namespace LocalNuget.Models
         {
             Mapper.CreateMap<StoragePackage, PackageInfoModel>()
                 .ForMember(model => model.VisualStudioProject, opt => opt.MapFrom(package => package.CsProjectFile))
-                .ForMember(model => model.Id, opt => opt.MapFrom(package => package.Name));
+                .ForMember(model => model.Id, opt => opt.MapFrom(package => package.Name))
+                .ForMember(model => model.NuspecInProject, opt => opt.MapFrom(package => package.NuspecProjectFile));
         }
     }
-    
+
 }

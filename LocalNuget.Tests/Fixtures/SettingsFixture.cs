@@ -12,6 +12,7 @@ namespace LocalNuget.Tests.Fixtures
 
         private static bool _addMapperProfiles = true;
         private static volatile object _addMapperLocker = new object();
+        private static volatile object _newDirectoryLocker = new object();
 
         public ISettings Settings { get; }
 
@@ -47,9 +48,17 @@ namespace LocalNuget.Tests.Fixtures
         private string GetNewDirectory()
         {
             // ReSharper disable once AssignNullToNotNullAttribute
-            var newDir = new DirectoryInfo(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), Guid.NewGuid().ToString()));
-            newDir.Create();
-            return newDir.FullName;
+            lock (_newDirectoryLocker)
+            {
+                var newDir =
+                    new DirectoryInfo(
+                        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                            Guid.NewGuid().ToString()));
+                if (newDir.Exists)
+                    return GetNewDirectory();
+                newDir.Create();
+                return newDir.FullName;
+            }
         }
 
     }

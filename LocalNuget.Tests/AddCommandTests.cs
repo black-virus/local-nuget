@@ -21,7 +21,7 @@ namespace LocalNuget.Tests
         {
             settingsFixture = settings;
             nuspecFixture = nuspec;
-
+            nuspecFixture.AttachToWorkDirectory(settingsFixture.Settings.WorkDirectory);
         }
 
         [Fact(DisplayName = "Testing default register nuspec")]
@@ -30,12 +30,12 @@ namespace LocalNuget.Tests
             nuspecFixture.ClearNuspecs();
             AddNuscpec(new AddLocalNugetOptions
             {
-                VisualStudioProject = NuspecFixture.CsProjLocation,
+                VisualStudioProject = nuspecFixture.CsProjLocation,
                 UseSettingsDefaults = false
             });
 
-            var dir = Path.GetDirectoryName(NuspecFixture.CsProjLocation);
-            var csProjName = new FileInfo(NuspecFixture.CsProjLocation);
+            var dir = Path.GetDirectoryName(nuspecFixture.CsProjLocation);
+            var csProjName = new FileInfo(nuspecFixture.CsProjLocation);
             if (dir == null) return;
             var nuspecFile = Path.Combine(dir, csProjName.Name.Replace(csProjName.Extension, ".nuspec"));
             var workNuspecFile = Path.Combine(settingsFixture.Settings.WorkDirectory, csProjName.Name.Replace(csProjName.Extension, ".nuspec"));
@@ -49,8 +49,8 @@ namespace LocalNuget.Tests
         {
             nuspecFixture.ClearNuspecs();
             AddNuscpec();
-            var dir = Path.GetDirectoryName(NuspecFixture.CsProjLocation);
-            var csProjName = new FileInfo(NuspecFixture.CsProjLocation);
+            var dir = Path.GetDirectoryName(nuspecFixture.CsProjLocation);
+            var csProjName = new FileInfo(nuspecFixture.CsProjLocation);
             if (dir == null) return;
             var nuspecFile = Path.Combine(dir, csProjName.Name.Replace(csProjName.Extension, ".nuspec"));
             Assert.False(string.IsNullOrEmpty(settingsFixture.Settings.Defaults.ProjectUrl)); // make sure we testing right behaviour
@@ -71,8 +71,8 @@ namespace LocalNuget.Tests
             {
                 Force = true
             });
-            var dir = Path.GetDirectoryName(NuspecFixture.CsProjLocation);
-            var csProjName = new FileInfo(NuspecFixture.CsProjLocation);
+            var dir = Path.GetDirectoryName(nuspecFixture.CsProjLocation);
+            var csProjName = new FileInfo(nuspecFixture.CsProjLocation);
             if (dir == null) return;
             var nuspecFile = Path.Combine(dir, csProjName.Name.Replace(csProjName.Extension, ".nuspec"));
             Assert.False(string.IsNullOrEmpty(settingsFixture.Settings.Defaults.ProjectUrl)); // make sure we testing right behaviour
@@ -87,7 +87,7 @@ namespace LocalNuget.Tests
             {
                 Options = options ?? new AddLocalNugetOptions()
             };
-            if (string.IsNullOrEmpty(cmd.Options.VisualStudioProject)) cmd.Options.VisualStudioProject = NuspecFixture.CsProjLocation;
+            if (string.IsNullOrEmpty(cmd.Options.VisualStudioProject)) cmd.Options.VisualStudioProject = nuspecFixture.CsProjLocation;
             cmd.Execute();
         }
 

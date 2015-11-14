@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Xml;
 using LocalNuget.Commands.Add;
 using LocalNuget.Tests.Fixtures;
@@ -52,9 +53,10 @@ namespace LocalNuget.Tests
             var csProjName = new FileInfo(NuspecFixture.CsProjLocation);
             if (dir == null) return;
             var nuspecFile = Path.Combine(dir, csProjName.Name.Replace(csProjName.Extension, ".nuspec"));
-            Assert.False(string.IsNullOrEmpty(settingsFixture.Settings.Defaults.LicenceUrl)); // make sure we testing right behaviour
-            Assert.False(string.IsNullOrEmpty(settingsFixture.Settings.Defaults.IconUrl));
-            CheckNuspecFile(nuspecFile, licenceUrl: settingsFixture.Settings.Defaults.LicenceUrl, iconUrl: settingsFixture.Settings.Defaults.IconUrl);
+            Assert.False(string.IsNullOrEmpty(settingsFixture.Settings.Defaults.ProjectUrl)); // make sure we testing right behaviour
+            Assert.False(string.IsNullOrEmpty(settingsFixture.Settings.Defaults.Author));
+            Assert.False(string.IsNullOrEmpty(settingsFixture.Settings.Defaults.Copyright));
+            CheckNuspecFile(nuspecFile, projectUrl: settingsFixture.Settings.Defaults.ProjectUrl, copyright: settingsFixture.Settings.Defaults.Copyright, authors: settingsFixture.Settings.Defaults.Author);
         }
 
         [Fact(DisplayName = "Testing add spec, if already exist")]
@@ -73,9 +75,10 @@ namespace LocalNuget.Tests
             var csProjName = new FileInfo(NuspecFixture.CsProjLocation);
             if (dir == null) return;
             var nuspecFile = Path.Combine(dir, csProjName.Name.Replace(csProjName.Extension, ".nuspec"));
-            Assert.False(string.IsNullOrEmpty(settingsFixture.Settings.Defaults.LicenceUrl)); // make sure we testing right behaviour
-            Assert.False(string.IsNullOrEmpty(settingsFixture.Settings.Defaults.IconUrl));
-            CheckNuspecFile(nuspecFile, licenceUrl: settingsFixture.Settings.Defaults.LicenceUrl, iconUrl: settingsFixture.Settings.Defaults.IconUrl);
+            Assert.False(string.IsNullOrEmpty(settingsFixture.Settings.Defaults.ProjectUrl)); // make sure we testing right behaviour
+            Assert.False(string.IsNullOrEmpty(settingsFixture.Settings.Defaults.Author));
+            Assert.False(string.IsNullOrEmpty(settingsFixture.Settings.Defaults.Copyright));
+            CheckNuspecFile(nuspecFile, projectUrl: settingsFixture.Settings.Defaults.ProjectUrl, copyright: settingsFixture.Settings.Defaults.Copyright, authors: settingsFixture.Settings.Defaults.Author);
         }
 
         private void AddNuscpec(AddLocalNugetOptions options = null)
@@ -98,8 +101,10 @@ namespace LocalNuget.Tests
             string description = "$description$",
             string licenceUrl = "",
             string projectUrl = "",
-            string iconUrl = "")
+            string iconUrl = "",
+            string copyright = "Copyright {0}")
         {
+            if (copyright.Contains("{0}")) copyright = string.Format(copyright, DateTime.Now.Year);
             var nuspecXmlDoc = new XmlDocument();
             nuspecXmlDoc.Load(nuspecFile);
             var xmlMeta = nuspecXmlDoc.SelectSingleNode("package/metadata") as XmlElement;
@@ -113,6 +118,7 @@ namespace LocalNuget.Tests
             Assert.Equal(licenceUrl, GetElementValue(xmlMeta, "licenseUrl"));
             Assert.Equal(projectUrl, GetElementValue(xmlMeta, "projectUrl"));
             Assert.Equal(iconUrl, GetElementValue(xmlMeta, "iconUrl"));
+            Assert.Equal(copyright, GetElementValue(xmlMeta, "copyright"));
         }
 
         private string GetElementValue(XmlNode xmlElement, string elementId, string fallback = "")

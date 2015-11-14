@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Text.RegularExpressions;
 using LocalNuget.Settings;
 using LocalNuget.Utils;
-using LocalNuget.Core.Exceptions;
 using LocalNuget.Core.Commands;
 using LocalNuget.Storage;
 
@@ -89,12 +89,36 @@ namespace LocalNuget.Commands.Add
             nuspecProjFile.Refresh();
             if (!nuspecProjFile.Exists) throw CommandException.CreateNuspecInProjectFailedException();
             // setup links
-            var nuspec = new Nuspec(nuspecProjFile.FullName)
+            var nuspec = new Nuspec(nuspecProjFile.FullName);
+            if (nuspec.LicenseUrl == "http://LICENSE_URL_HERE_OR_DELETE_THIS_LINE")
+                nuspec.LicenseUrl = string.Empty;
+            if (nuspec.ProjectUrl == "http://PROJECT_URL_HERE_OR_DELETE_THIS_LINE")
+                nuspec.ProjectUrl = string.Empty;
+            if (nuspec.IconUrl == "http://ICON_URL_HERE_OR_DELETE_THIS_LINE")
+                nuspec.IconUrl = string.Empty;
+            if (Options.UseSettingsDefaults)
             {
-                ProjectUrl = String.Empty,
-                IconUrl = Options.UseSettingsDefaults ? settings.Defaults.IconUrl : String.Empty,
-                LicenseUrl = Options.UseSettingsDefaults ? settings.Defaults.LicenceUrl : String.Empty
-            };
+                if (string.IsNullOrEmpty(nuspec.ProjectUrl))
+                {
+                    nuspec.ProjectUrl = settings.Defaults.ProjectUrl;
+                }
+                if (string.IsNullOrEmpty(nuspec.LicenseUrl))
+                {
+                    nuspec.LicenseUrl = settings.Defaults.LicenceUrl;
+                }
+                if ((nuspec.Authors.Length == 1 && nuspec.Authors[0] == "$author$") || nuspec.Authors.Length == 0)
+                {
+                    nuspec.Authors = new[] { settings.Defaults.Author };
+                }
+                if (string.IsNullOrEmpty(nuspec.Copyright) || Regex.IsMatch(nuspec.Copyright, @"Copyright (\d{4})"))
+                {
+                    var yM = Regex.Match(settings.Defaults.Copyright, @"(\d{4})");
+                    if (yM.Success)
+                    {
+                        nuspec.Copyright = settings.Defaults.Copyright.Replace(yM.Value, DateTime.Now.Year.ToString());
+                    }
+                }
+            }
             nuspec.Save();
             nuspecProjFile.CopyTo(nuspecWorkFile.FullName);
             storage.Add(nuspecProjFile.Name, csProjFileInfo.FullName, nuspecProjFile.FullName, Options.Force);

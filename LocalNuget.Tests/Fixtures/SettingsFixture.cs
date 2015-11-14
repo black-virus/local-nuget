@@ -19,8 +19,9 @@ namespace LocalNuget.Tests.Fixtures
         {
             var mockSettings = new Mock<ISettings>();
             var mockSettingsDefaults = new Mock<ISettingsDefaults>();
-            mockSettingsDefaults.SetupGet(defaults => defaults.LicenceUrl).Returns("http://domain.org");
-            mockSettingsDefaults.SetupGet(defaults => defaults.IconUrl).Returns("http://domain.org/project.png");
+            mockSettingsDefaults.SetupGet(defaults => defaults.ProjectUrl).Returns("http://domain.org");
+            mockSettingsDefaults.SetupGet(defaults => defaults.Author).Returns("Adrian Kaczmarek");
+            mockSettingsDefaults.SetupGet(defaults => defaults.Copyright).Returns("Black House (R) 2015");
             mockSettings.SetupGet(lsetting => lsetting.WorkDirectory)
                 .Returns(GetNewDirectory());
             mockSettings.SetupGet(lsettings => lsettings.Defaults).Returns(mockSettingsDefaults.Object);

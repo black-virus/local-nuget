@@ -22,14 +22,15 @@ namespace LocalNuget.Tests
                 WorkDirectory = AppDomain.CurrentDomain.BaseDirectory,
                 Defaults = new DefaultSettingsDefaults
                 {
-                    IconUrl = "http://path.icon",
-                    LicenceUrl = "http://licence.url"
+                    Author = "virus",
+                    ProjectUrl = "http://project.url",
+                    Copyright="2015"
                 }
             };
             var s = JsonConvert.SerializeObject(settings);
             s.Should()
                 .Be(
-                    "{\"WorkDirectory\":\"C:\\\\00_Praca\\\\99_WorkingCopy\\\\Local NUGET\\\\LocalNuget.Tests\\\\bin\\\\Debug\",\"Defaults\":{\"LicenceUrl\":\"http://licence.url\",\"IconUrl\":\"http://path.icon\"}}");
+                    "{\"WorkDirectory\":\"C:\\\\00_Praca\\\\99_WorkingCopy\\\\Local NUGET\\\\LocalNuget.Tests\\\\bin\\\\Debug\",\"Defaults\":{\"LicenceUrl\":null,\"ProjectUrl\":\"http://project.url\",\"Author\":\"virus\",\"Copyright\":\"2015\"}}");
         }
 
     }
